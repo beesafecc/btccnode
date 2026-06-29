@@ -8,16 +8,17 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
+    container: debian:bookworm
 
     steps:
       - name: Install dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y \
+          apt-get update
+          apt-get install -y \
             git build-essential libtool autotools-dev automake pkg-config \
             bsdmainutils python3 libevent-dev libboost-dev libsqlite3-dev \
-            libzmq3-dev ca-certificates
+            libzmq3-dev ca-certificates curl
 
       - name: Clone Bitcoin-Classic
         run: |
@@ -78,6 +79,6 @@ jobs:
           body: |
             BTCC Node binaries compiled from Bitcoin-Classic (latest main)
             - Platform: linux/amd64
-            - Built on: ubuntu-24.04
+            - Built on: debian:bookworm
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
