@@ -3,9 +3,12 @@ name: Build BTCC Node
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Install dependencies
@@ -48,7 +51,7 @@ jobs:
           sha256sum btcc-node-linux-amd64.tar.gz > btcc-node-linux-amd64.tar.gz.sha256
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7.0.1
         with:
           name: btcc-node-linux-amd64
           path: |
@@ -59,22 +62,22 @@ jobs:
       - name: Delete old latest release
         run: |
           gh release delete latest --yes || true
-          git tag -d latest || true
           gh api -X DELETE repos/${{ github.repository }}/git/refs/tags/latest || true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create latest release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3.0.1
         with:
           tag_name: latest
           name: "BTCC Node (latest)"
+          make_latest: true
           files: |
             dist/btcc-node-linux-amd64.tar.gz
             dist/btcc-node-linux-amd64.tar.gz.sha256
           body: |
             BTCC Node binaries compiled from Bitcoin-Classic (latest main)
             - Platform: linux/amd64
-            - Built on: ubuntu-22.04
+            - Built on: ubuntu-24.04
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
